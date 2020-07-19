@@ -1,3 +1,10 @@
 __pycache__
 .DS_Store
 .dist
+
+# tensorboardX
+*/runs
+*/runs/*
+
+# kogpt2
+kogpt2
