@@ -53,7 +53,7 @@ kogpt2_config = {
 }
 
 
-def get_pytorch_kogpt2_model(ctx='cpu', cachedir='~/kogpt2/'):
+def get_pytorch_kogpt2_model(ctx='cpu', cachedir='../kogpt2/'):
     # download model
     model_info = pytorch_kogpt2
     model_path = _download(model_info['url'],
@@ -85,6 +85,34 @@ def get_kogpt2_model(model_file, vocab_file, ctx="cpu"):
                                                          bos_token='<s>',
                                                          eos_token='</s>')
     return kogpt2model, vocab_b_obj
+
+
+def load_kogpt2_model(ctx='cpu', cachedir='../kogpt2/'):
+    model_info = pytorch_kogpt2
+    vocab_info = tokenizer
+
+    model_path = '../kogpt2/pytorch_kogpt2_676e9bcfa7.params'
+    vocab_path = '../kogpt2/kogpt2_news_wiki_ko_cased_818bfa919d.spiece'
+
+    return get_kogpt2_model(model_path, vocab_path, ctx)
+
+
+def load_kogpt2_model_from_checkpoint(kogpt2, load_path, device, ctx='cpu'):
+    try:
+        checkpoint = torch.load(load_path, map_location=device)
+        
+        kogpt2model = GPT2LMHeadModel(config=GPT2Config.from_dict(kogpt2_config))
+        kogpt2model.load_state_dict(checkpoint['model_state_dict'])
+
+        kogpt2model.eval()
+    except:
+        count = 0
+        kogpt2model, _ = load_kogpt2_model()
+    else:
+        count = int(re.findall("\d+", load_path)[1])
+    
+    print(count)
+    return kogpt2model, count
 
 
 if __name__ == "__main__":
