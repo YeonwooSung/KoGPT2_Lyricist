@@ -23,12 +23,16 @@ from prepare_pytorch_kogpt2 import get_pytorch_kogpt2_model, load_kogpt2_model, 
 
 # set required arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', type=int, default=200, help="epoch 를 통해서 학습 범위를 조절합니다.")
-parser.add_argument('--save_path', type=str, default='./checkpoint/', help="학습 결과를 저장하는 경로입니다.")
-parser.add_argument('--load_path', type=str, default='./checkpoint/Alls/KoGPT2_checkpoint_296000.tar', help="학습된 결과를 불러오는 경로입니다.")
-parser.add_argument('--samples', type=str, default="samples/", help="생성 결과를 저장할 경로입니다.")
-parser.add_argument('--data_file_path', type=str, default='dataset/lyrics_dataset.txt', help="학습할 데이터를 불러오는 경로입니다.")
-parser.add_argument('--batch_size', type=int, default=8, help="batch_size 를 지정합니다.")
+
+parser.add_argument('--epoch', type=int, default=200, help="The number of epochs.")
+parser.add_argument('--batch_size', type=int, default=8, help="The batch size.")
+parser.add_argument('--lr', type=float, default=0.01, help="Learning Rate")
+
+parser.add_argument('--save_path', type=str, default='../checkpoint/', help="File path to store checkpoints")
+parser.add_argument('--load_path', type=str, default='../checkpoint/Alls/KoGPT2_checkpoint_296000.tar', help="File path to load checkpoints")
+
+parser.add_argument('--samples', type=str, default="samples/", help="File path to store generated texts")
+parser.add_argument('--data_file_path', type=str, default='../dataset/lyrics_dataset.txt', help="File path of the dataset")
 
 args = parser.parse_args()
 
