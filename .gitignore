@@ -8,3 +8,6 @@ __pycache__
 
 # kogpt2
 kogpt2
+
+# dataset
+dataset/*
