@@ -13,6 +13,7 @@ import re
 from absl import app, logging
 import argparse
 
+from dataset import KoLyricsDataset
 from utils import get_tokenizer, download, tokenizer
 from prepare_pytorch_kogpt2 import get_pytorch_kogpt2_model, load_kogpt2_model, load_kogpt2_model_from_checkpoint
 
@@ -92,9 +93,76 @@ def main(_):
     #TODO tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
     tok = SentencepieceTokenizer(tok_path)
 
-    #TODO dataset
+    dataset = KoLyricsDataset(data_file_path, vocab, tok)
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
 
     print('Get dataset successfully')
+
+    learning_rate = args.lr
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    print('KoGPT-2 Start Transfer Learning')
+    avg_loss = (0.0, 0.0)
+
+
+    # start transfer learning
+    for epoch in range(epoch):
+        for data in data_loader:
+            optimizer.zero_grad()
+
+            data = torch.stack(data) # list of Tensor로 구성되어 있기 때문에 list를 stack을 통해 변환해준다.
+            data = data.transpose(1,0)
+            data = data.to(ctx)
+            
+            model = model.to(ctx)
+
+            outputs = model(data, labels=data)
+            loss, logits = outputs[:2]
+            loss = loss.to(ctx)
+            loss.backward()
+            avg_loss = (avg_loss[0] * 0.99 + loss, avg_loss[1] * 0.99 + 1.0)
+            optimizer.step()
+
+            if count % 10 == 0:
+                print('epoch no.{0} train no.{1}  loss = {2:.5f} avg_loss = {3:.5f}' . format(epoch, count, loss, avg_loss[0] / avg_loss[1]))
+                summary.add_scalar('loss/avg_loss', avg_loss[0] / avg_loss[1], count)
+                summary.add_scalar('loss/loss', loss, count)
+            
+
+            
+            if (count > 0 and count % 1000 == 0) or (len(data) < batch_size):
+                sent = sample_sequence(model.to("cpu"), tok, vocab, sent="사랑", text_size=100, temperature=0.7, top_p=0.8, top_k=40)
+                sent = sent.replace("<unused0>", "\n")
+                print(sent)
+
+                summary.add_text('Text', sent, count)
+
+                if count > 500000:
+                    now = [int(n) for n in os.listdir(samples)]
+                    now = max(now)
+                    f = open(samples + str(now + 1), 'w', encoding="utf-8")
+                    f.write(sent)
+                    f.close()
+            #########################################
+
+            count += 1
+
+
+            # check if the program needs to save model
+            if (count > 0 and count % 10000 == 0) or (len(data) < batch_size):
+                try:
+                    torch.save({
+                        'epoch': epoch,
+                        'train_no': count,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': loss
+                    }, save_path + 'KoGPT2_checkpoint_' + str(count) + '.tar')
+                except:
+                    pass
+
+
 
 
 if __name__ == '__main__':
