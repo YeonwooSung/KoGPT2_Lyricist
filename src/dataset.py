@@ -1,3 +1,8 @@
+# Most of the codes in this file are copied from here: <https://github.com/gyunggyung/KoGPT2-FineTuning>
+# Origianl Author: gyunggyung <https://github.com/gyunggyung>
+#
+# Modified by: Yeonwoo Sung
+
 from torch.utils.data import Dataset
 from gluonnlp.data import SentencepieceTokenizer
 import gluonnlp
@@ -9,13 +14,15 @@ from utils import download, tokenizer, get_tokenizer
 
 
 class KoLyricsDataset(Dataset):
-	"""web novel dataset"""
+	"""Korean Lyrics dataset"""
 
 	def __init__(self, file_path, vocab, tokenizer):
 		self.file_path = file_path
-		self.data =[]
-		self.vocab =vocab
+		self.data = []
+		self.vocab = vocab
 		self.tokenizer = tokenizer
+
+		# open text file
 		file = open(self.file_path, 'r', encoding='utf-8')
 
 		lines = file.read()
@@ -24,9 +31,11 @@ class KoLyricsDataset(Dataset):
 		datasets = []
 		now = ""
 		for i, line in enumerate(lines):
-			if i % 30 == 0 and i != 0:
+			# if i % 30 == 0 and i != 0:
+			if line.strip() == "<|endoftext|>":
 				datasets.append(now)
 				now = ""
+				continue
 			now = now + "\n" + line
 
 		# lines = lines.split("<|endoftext|>")
@@ -34,6 +43,8 @@ class KoLyricsDataset(Dataset):
 		# lines = [str(line) for line in lines]
 
 		print("tokenizer ending")
+
+		# use for loop to iterate array of lines
 		for line in datasets:
 			if not line:
 				break
