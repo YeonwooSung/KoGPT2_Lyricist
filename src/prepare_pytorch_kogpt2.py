@@ -25,6 +25,7 @@ import sys
 import gluonnlp as nlp
 import requests
 import torch
+import re
 
 from transformers import GPT2Config, GPT2LMHeadModel
 from utils import download as _download

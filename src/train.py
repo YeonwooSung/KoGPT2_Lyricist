@@ -16,10 +16,7 @@ import argparse
 from dataset import KoLyricsDataset
 from utils import get_tokenizer, download, tokenizer
 from prepare_pytorch_kogpt2 import get_pytorch_kogpt2_model, load_kogpt2_model, load_kogpt2_model_from_checkpoint
-
-# from kogpt2.model.torch_gpt2 import GPT2Config, GPT2LMHeadModel
-# from kogpt2.data import Read_Dataset
-# from kogpt2.model.sample import sample_sequence
+from sample import sample_sequence
 
 
 # set required arguments
