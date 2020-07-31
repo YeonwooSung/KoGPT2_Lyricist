@@ -158,6 +158,20 @@ def main(_):
                     }, save_path + 'KoGPT2_checkpoint_' + str(count) + '.tar')
                 except:
                     pass
+            
+            del loss, logits, outputs, data, model
+            loss = None
+            logits = None
+            outputs = None
+            model = None
+            data = None
+            gc.collect()
+
+            with torch.no_grad():
+                torch.cuda.empty_cache()
+        
+        with torch.no_grad():
+            torch.cuda.empty_cache()
 
 
 
