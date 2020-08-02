@@ -37,7 +37,7 @@ def sample_sequence(model, tok, vocab, sent, text_size, temperature, top_p, top_
     if len(toked) > 1022:
         return 0
 
-    while 1:  # 이부분도 적절하게 바꾸기.
+    while 1:
         input_ids = torch.tensor(
             [vocab[vocab.bos_token], ] + vocab[toked]).unsqueeze(0)
         predicts = model(input_ids)
