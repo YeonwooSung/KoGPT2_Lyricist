@@ -31,16 +31,12 @@ class KoLyricsDataset(Dataset):
 		datasets = []
 		now = ""
 		for i, line in enumerate(lines):
-			# if i % 30 == 0 and i != 0:
-			if line.strip() == "<|endoftext|>":
+			if i % 30 == 0 and i != 0:
 				datasets.append(now)
 				now = ""
 				continue
 			now = now + "\n" + line
 
-		# lines = lines.split("<|endoftext|>")
-		# lines = [line.split("\n") for line in lines]
-		# lines = [str(line) for line in lines]
 
 		print("tokenizer ending")
 
